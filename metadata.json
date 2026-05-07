@@ -1,0 +1,6 @@
+{
+  "name": "Raindrop AI Navigator",
+  "description": "A beautiful grid-layout bookmark manager powered by Raindrop.io, wrapped with AI capabilities to auto-enrich bookmark metadata.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
