@@ -3,14 +3,14 @@ interface Env {
   VITE_LOGIN_KEY?: string;
 }
 
-export const onRequestGet: PagesFunction<Env> = async (context) => {
+export const onRequestGet = async (context: any) => {
   const key = context.env.LOGIN_KEY || context.env.VITE_LOGIN_KEY;
   return new Response(JSON.stringify({ authRequired: !!key }), {
     headers: { "content-type": "application/json" }
   });
 };
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost = async (context: any) => {
   const key = context.env.LOGIN_KEY || context.env.VITE_LOGIN_KEY;
   if (!key) {
     return new Response(JSON.stringify({ success: true }), { headers: { "content-type": "application/json" } });

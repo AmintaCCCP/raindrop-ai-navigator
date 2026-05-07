@@ -1,6 +1,6 @@
 interface Env {}
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost = async (context: any) => {
   try {
     const { url }: any = await context.request.json();
     if (!url) return new Response(JSON.stringify({ error: 'URL is required' }), { status: 400, headers: { "content-type": "application/json" } });

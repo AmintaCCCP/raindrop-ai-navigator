@@ -1,6 +1,6 @@
 interface Env {}
 
-export const onRequestPost: PagesFunction<Env> = async (context) => {
+export const onRequestPost = async (context: any) => {
   try {
     const { url, title, currentDescription, settings }: any = await context.request.json();
     const { baseUrl, apiKey, modelId, language } = settings || {};

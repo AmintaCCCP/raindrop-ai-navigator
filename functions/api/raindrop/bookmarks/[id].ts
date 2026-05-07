@@ -2,13 +2,13 @@ interface Env {
   RAINDROP_API_KEY?: string;
 }
 
-const getHeaders = (request: Request, env: Env) => {
+const getHeaders = (request: any, env: Env) => {
   const apiKey = request.headers.get('x-raindrop-key') || env.RAINDROP_API_KEY;
   if (!apiKey) throw new Error('RAINDROP_API_KEY is missing');
   return { Authorization: `Bearer ${apiKey}` };
 };
 
-export const onRequestGet: PagesFunction<Env> = async (context) => {
+export const onRequestGet = async (context: any) => {
   try {
     const id = context.params.id as string;
     const url = new URL(context.request.url);
@@ -26,7 +26,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 };
 
-export const onRequestPut: PagesFunction<Env> = async (context) => {
+export const onRequestPut = async (context: any) => {
   try {
     const id = context.params.id as string;
     const body = await context.request.json();
@@ -45,7 +45,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   }
 };
 
-export const onRequestDelete: PagesFunction<Env> = async (context) => {
+export const onRequestDelete = async (context: any) => {
   try {
     const id = context.params.id as string;
     

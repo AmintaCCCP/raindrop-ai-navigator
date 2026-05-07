@@ -2,7 +2,7 @@ interface Env {
   RAINDROP_API_KEY?: string;
 }
 
-export const onRequestGet: PagesFunction<Env> = async (context) => {
+export const onRequestGet = async (context: any) => {
   try {
     const apiKey = context.request.headers.get('x-raindrop-key') || context.env.RAINDROP_API_KEY;
     if (!apiKey) throw new Error('RAINDROP_API_KEY is missing');

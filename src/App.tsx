@@ -37,7 +37,7 @@ export default function App() {
         }
       }).catch(err => {
          console.warn('Failed to check auth configuration', err);
-         // Fallback open if request fails
+         setAuthConfigured(false);
          setIsAuthenticated(true);
       });
   }, []);
