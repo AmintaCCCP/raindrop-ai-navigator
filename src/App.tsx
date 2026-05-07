@@ -6,15 +6,41 @@ import { AppSettings } from './services/api';
 import { Droplet, Menu, Search, Key, ArrowRight } from 'lucide-react';
 
 export default function App() {
-  const requiredKey = import.meta.env.VITE_LOGIN_KEY;
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // If no key is set in envelope, always authenticated
-    if (!requiredKey) return true;
-    return localStorage.getItem('app_auth_key') === requiredKey;
-  });
-  
+  const [authConfigured, setAuthConfigured] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loginInput, setLoginInput] = useState('');
   const [loginError, setLoginError] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/check-auth')
+      .then(res => res.json() as Promise<{authRequired: boolean}>)
+      .then(data => {
+        if (!data.authRequired) {
+           setAuthConfigured(false);
+           setIsAuthenticated(true);
+        } else {
+           setAuthConfigured(true);
+           const savedKey = localStorage.getItem('app_auth_key');
+           if (savedKey) {
+             fetch('/api/check-auth', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ key: savedKey })
+             }).then(r => r.json() as Promise<{success: boolean}>).then(verifyData => {
+               if (verifyData.success) {
+                  setIsAuthenticated(true);
+               } else {
+                  localStorage.removeItem('app_auth_key');
+               }
+             }).catch(() => { /* handled */ });
+           }
+        }
+      }).catch(err => {
+         console.warn('Failed to check auth configuration', err);
+         // Fallback open if request fails
+         setIsAuthenticated(true);
+      });
+  }, []);
 
   const [activeCollectionId, setActiveCollectionId] = useState<number | null>(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -33,16 +59,30 @@ export default function App() {
     localStorage.setItem('app_settings', JSON.stringify(settings));
   }, [settings]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginInput === requiredKey) {
-      localStorage.setItem('app_auth_key', requiredKey);
-      setIsAuthenticated(true);
-      setLoginError(false);
-    } else {
+    try {
+      const res = await fetch('/api/check-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: loginInput })
+      });
+      const data = await res.json() as { success: boolean };
+      if (data.success) {
+        localStorage.setItem('app_auth_key', loginInput);
+        setIsAuthenticated(true);
+        setLoginError(false);
+      } else {
+         setLoginError(true);
+      }
+    } catch {
        setLoginError(true);
     }
   };
+
+  if (authConfigured === null) {
+     return <div className="min-h-screen bg-[#0f172a] text-slate-200 flex items-center justify-center">Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return (

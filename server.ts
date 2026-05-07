@@ -25,6 +25,19 @@ async function startServer() {
 
   // --- API Routes ---
 
+  // 0. Auth check
+  app.get('/api/check-auth', (req, res) => {
+    const key = process.env.LOGIN_KEY || process.env.VITE_LOGIN_KEY;
+    res.json({ authRequired: !!key });
+  });
+
+  app.post('/api/check-auth', (req, res) => {
+    const key = process.env.LOGIN_KEY || process.env.VITE_LOGIN_KEY;
+    if (!key) return res.json({ success: true });
+    if (req.body.key === key) return res.json({ success: true });
+    res.status(401).json({ success: false, error: 'Invalid key' });
+  });
+
   // 1. Get Collections
   app.get('/api/raindrop/collections', async (req, res) => {
     try {
